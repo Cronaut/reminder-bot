@@ -1,0 +1,20 @@
+{
+  "name": "mbot",
+  "version": "1.0.0",
+  "description": "attempt to make a messenger bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "messenger",
+    "bot"
+  ],
+  "author": "cronaut",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "request": "^2.81.0"
+  }
+}
