@@ -39,13 +39,13 @@ app.post('/webhook/', function (req, res) {
         let sender = event.sender.id
         if (event.message && event.message.text) {
             let text = event.message.text
-            sendTextMessage(sender, "is this becky? becky lemme smash")
+            sendTextMessage(sender, "HELLO! I\'M A PRETTY ANGRY CORN.")
         }
     }
     res.sendStatus(200)
 })
 
-const token = "EAAGII9tDr9EBAFSBYt0j0o4IeRFqZBnmIZB2z2Yh3ZBzZAleQRKIoh31Sbywq2EIcaZCfztYXyeHKkagtlwcYG0CshJaRzqsFGwDvHoZAlYbY1CZCV1Tezx2YfZBdBO6mWyFHYZB9Rl6zXvUAC1nf7qov4sloMigCysSLioz6dgbZASOhRAoQZAvDhZA"
+const token = process.env.FB_PAGE_ACCESS_TOKEN
 
 function sendTextMessage(sender, text) {
     let messageData = { text: text }
