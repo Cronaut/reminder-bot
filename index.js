@@ -1,9 +1,44 @@
 'use strict'
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const request = require('request')
-const app = express()
+const express = require('express');
+const bodyParser = require('body-parser');
+const request = require('request');
+const mongodb = require('mongodb');
+const app = express();
+
+// Create seed data
+
+var seedData = [
+  {
+    id: '1',
+    todos: ['meowing', 'drawing for 2 hours']
+  },
+  {
+    id: '2',
+    todos: ['dancing', 'playing guitar', 'watching birds']
+  },
+
+];
+
+var uri = process.env.MONGODB_URI;
+
+mongodb.MongoClient.connect(uri, (err, db) => {
+      if (err) throw err;
+      var users = db.collection('users');
+
+      users.insert(seedData, (err, result) => {
+          if (err) throw err;
+
+          seedData.forEach((user, i) => {
+            console.log(user.todos + i);
+
+          });
+
+          db.close((err) => {
+              if (err) throw err;
+          });
+      });
+});
 
 app.set('port', (process.env.PORT || 5000))
 
@@ -64,4 +99,9 @@ function sendTextMessage(sender, text) {
             console.log('Error: ', response.body.error)
         }
     })
+}
+
+function parseMessage(message) {
+    // starts with -
+    // includes "view todos"
 }
