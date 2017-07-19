@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const config = require('./config/database');
 
 // bring up the Entry model
-let Entry = require('../models/entry');
+let Entry = require('./models/entry');
 
 mongoose.connect(config.database);
 let db = mongoose.connection;
