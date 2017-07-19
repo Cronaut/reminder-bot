@@ -6,6 +6,8 @@ const request = require('request');
 const mongodb = require('mongodb');
 const mongoose = require('mongoose');
 
+const config = require('./config/database');
+
 mongoose.connect(config.database);
 let db = mongoose.connection;
 
@@ -32,8 +34,6 @@ let seedData = [
   },
 
 ];
-
-let uri = process.env.MONGODB_URI;
 
 app.set('port', (process.env.PORT || 5000))
 
