@@ -70,8 +70,6 @@ app.post('/webhook/', function (req, res) {
     for (let i = 0; i < messaging_events.length; i++) {
         let event = req.body.entry[0].messaging[i];
         let sender = event.sender.id;
-        console.log('Magic tricks to get the bot sender id: ', sender);
-       
         if (event.message && event.message.text) {
 
             // parseMessage(event.message.text);
@@ -89,8 +87,8 @@ app.post('/webhook/', function (req, res) {
                         console.log('The entry has been added.');
                     }
                 });
-                
-                sendTextMessage(sender, "Your todo is: " + event.message.text);
+
+                sendTextMessage(sender, "Your todo is:", event.message.text);
             }
         }
     }
