@@ -80,7 +80,7 @@ app.post('/webhook/', function (req, res) {
 
             entries.save((err) => {
                 if(err) {
-                    console.log(err);
+                    console.log('Something really weird has happened:', err);
                     return;
                 } else {
                     console.log('The entry has been added.');
@@ -108,11 +108,12 @@ function sendTextMessage(sender, text) {
         if (error) {
             console.log('Error sending messages: ', error);
         } else if (response.body.error) {
-            console.log('Error: ', response.body.error);
+            console.log('Error, something wrong with response body: ', response.body.error);
         }
     });
 }
 
+/*
 function parseMessage(event) {
     // starts with -
     // includes "view todos"
@@ -125,8 +126,8 @@ function parseMessage(event) {
     } else {
         throw "The passed object is somehow not a string.";
     }
-    return false;
-}
+   return false;
+}*/
 
 /*let users = require('./routes/users');
 app.use('/users', users);*/
