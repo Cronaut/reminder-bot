@@ -4,11 +4,24 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
 const mongodb = require('mongodb');
+const mongoose = require('mongoose');
+
+mongoose.connect(config.database);
+let db = mongoose.connection;
+
+db.on('error', (err) => {
+    console.log(err);
+});
+
+db.once('open', () => {
+    console.log('Connection to DB has been established.');
+});
+
 const app = express();
 
 // Create seed data
 
-var seedData = [
+let seedData = [
   {
     id: '1',
     todos: ['meowing', 'drawing for 2 hours']
@@ -20,25 +33,7 @@ var seedData = [
 
 ];
 
-var uri = process.env.MONGODB_URI;
-
-mongodb.MongoClient.connect(uri, (err, db) => {
-      if (err) throw err;
-      var users = db.collection('users');
-
-      users.insert(seedData, (err, result) => {
-          if (err) throw err;
-
-          seedData.forEach((user, i) => {
-            console.log(user.todos + i);
-
-          });
-
-          db.close((err) => {
-              if (err) throw err;
-          });
-      });
-});
+let uri = process.env.MONGODB_URI;
 
 app.set('port', (process.env.PORT || 5000))
 
@@ -73,6 +68,8 @@ app.post('/webhook/', function (req, res) {
         let event = req.body.entry[0].messaging[i]
         let sender = event.sender.id
         if (event.message && event.message.text) {
+            // parseMessage(event.message.text);
+
             let text = event.message.text
             sendTextMessage(sender, "HELLO! I\'M A PRETTY ANGRY CORN.")
         }
@@ -101,7 +98,37 @@ function sendTextMessage(sender, text) {
     })
 }
 
-function parseMessage(message) {
+function parseMessage(event) {
     // starts with -
     // includes "view todos"
+    
+    let message = event.message.text;
+    if (typeof message === 'string' || message instanceof String) {
+        if (message.startswith('-')) {
+            return true;
+        }
+    } else {
+        throw "The passed object is somehow not a string.";
+    }
+
+    return false;
+    
 }
+
+/*mongodb.MongoClient.connect(uri, (err, db) => {
+      if (err) throw err;
+      let users = db.collection('users');
+
+      users.insert(seedData, (err, result) => {
+          if (err) throw err;
+
+          seedData.forEach((user, i) => {
+            console.log(user.todos + i);
+
+          });
+
+          db.close((err) => {
+              if (err) throw err;
+          });
+      });
+});*/
