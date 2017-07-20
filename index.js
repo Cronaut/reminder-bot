@@ -70,25 +70,27 @@ app.post('/webhook/', function (req, res) {
     for (let i = 0; i < messaging_events.length; i++) {
         let event = req.body.entry[0].messaging[i];
         let sender = event.sender.id;
-        if (event.message && event.message.text) {
-            console.log('Say something' + event.message.text);
-            // parseMessage(event.message.text);
+        let message = event.message.text;
+
+        if (event.message && message) {
             // add the todo entries to db
             if (sender != process.env.BOTSENDER_ID) {
-                let entries = new Entry();
-                entries.userid = sender;
-                entries.todos = event.message.text;
-                console.log('Im giving up' + event.message.text);
-                entries.save((err) => {
-                    if(err) {
-                        console.log('Something really weird has happened:', err);
-                        return;
-                    } else {
-                        console.log('The entry has been added.');
-                    }
-                });
-                sendTextMessage(sender, 'I used to work just fine ' + event.message.text);
+                if(parseMessage(message)) {
+                    let entries = new Entry();
+                    entries.userid = sender;
+                    entries.todos = event.message.text;
+                    
+                    entries.save((err) => {
+                        if(err) {
+                            console.log('Something really weird has happened:', err);
+                            return;
+                        } else {
+                            console.log('The entry has been added.');
+                        }
+                    });
+                }
             }
+            sendTextMessage(sender, 'I still work fine, I just pretended: \n' + message);
         }
     }
     res.sendStatus(200);
@@ -115,12 +117,11 @@ function sendTextMessage(sender, text) {
     });
 }
 
-/*
-function parseMessage(event) {
+
+function parseMessage(message) {
     // starts with -
     // includes "view todos"
     
-    let message = event.message.text;
     if (typeof message === 'string' || message instanceof String) {
         if (message.startswith('-')) {
             return true;
@@ -129,10 +130,7 @@ function parseMessage(event) {
         throw "The passed object is somehow not a string.";
     }
    return false;
-}*/
-
-/*let users = require('./routes/users');
-app.use('/users', users);*/
+}
 
 /*mongodb.MongoClient.connect(uri, (err, db) => {
       if (err) throw err;
