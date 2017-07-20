@@ -75,19 +75,29 @@ app.post('/webhook/', function (req, res) {
         if (event.message && message) {
             // add the todo entries to db
             if (sender != process.env.BOTSENDER_ID) {
-                if(parseMessage(message)) {
+                if (parseMessage(event)) {
+                    
                     let entries = new Entry();
                     entries.userid = sender;
                     entries.todos = event.message.text;
                     
-                    entries.save((err) => {
+                    Entry.findOneAndUpdate({userid: sender}, entries, {upsert: true}, (err, docs) => {
+                       if (err) {
+                           console.log('Something really weird has happened:', err);
+                            return;
+                       } else {
+                            console.log(upsert ? 'Entry has been updated.' : 'Entry has been added.');
+                       }
+                    });
+                    
+                    /*entries.save((err) => {
                         if(err) {
                             console.log('Something really weird has happened:', err);
                             return;
                         } else {
                             console.log('The entry has been added.');
                         }
-                    });
+                    });*/
                 }
             }
             sendTextMessage(sender, 'I still work fine, I just pretended: \n' + message);
@@ -118,10 +128,11 @@ function sendTextMessage(sender, text) {
 }
 
 
-function parseMessage(message) {
+function parseMessage(event) {
     // starts with -
     // includes "view todos"
-    
+
+    let message = event.message.text;    
     if (typeof message === 'string' || message instanceof String) {
         if (message.startsWith('-')) {
             return true;
