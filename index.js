@@ -76,9 +76,10 @@ app.post('/webhook/', function (req, res) {
             if (sender != process.env.BOTSENDER_ID) {
                 if (parseMessage(event)) {
                     
-                    let entries = new Entry();
-                    entries.userid = sender;
-                    entries.todos = event.message.text;
+                    let entries = {
+                        userid: sender,
+                        todos: event.message.text
+                    }
                     
                     let upsert = {upsert: true};
                     Entry.findOneAndUpdate({userid: sender}, entries, upsert, (err, docs) => {
