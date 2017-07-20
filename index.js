@@ -99,7 +99,7 @@ app.post('/webhook/', function (req, res) {
                     });*/
                 }
             }
-            sendTextMessage(sender, 'I still work fine, I just pretended: \n' + message);
+            sendTextMessage(sender, 'I still work fine, I just pretended: \n' + event.message.text);
         }
     }
     res.sendStatus(200);
