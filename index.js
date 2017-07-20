@@ -90,18 +90,10 @@ app.post('/webhook/', function (req, res) {
                             console.log(upsert.upsert.valueOf() ? 'Entry has been updated.' : 'Entry has been added.');
                        }
                     });
-
-                    /*entries.save((err) => {
-                        if(err) {
-                            console.log('Something really weird has happened:', err);
-                            return;
-                        } else {
-                            console.log('The entry has been added.');
-                        }
-                    });*/
                 }
+                
+                sendTextMessage(sender, 'I still work fine, I just pretended: \n' + event.message.text);
             }
-            sendTextMessage(sender, 'I still work fine, I just pretended: \n' + event.message.text);
         }
     }
     res.sendStatus(200);
