@@ -71,14 +71,14 @@ app.post('/webhook/', function (req, res) {
         let event = req.body.entry[0].messaging[i];
         let sender = event.sender.id;
         if (event.message && event.message.text) {
-
+            console.log('Say something' + event.message.text);
             // parseMessage(event.message.text);
             // add the todo entries to db
             if (sender != process.env.BOTSENDER_ID) {
                 let entries = new Entry();
                 entries.userid = sender;
                 entries.todos = event.message.text;
-
+                console.log('Im giving up' + event.message.text);
                 entries.save((err) => {
                     if(err) {
                         console.log('Something really weird has happened:', err);
@@ -87,7 +87,8 @@ app.post('/webhook/', function (req, res) {
                         console.log('The entry has been added.');
                     }
                 });
-
+                
+                console.log('on you' + event.message.text);
                 sendTextMessage(sender, "Your todo is:", event.message.text);
             }
         }
