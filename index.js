@@ -61,13 +61,7 @@ app.post('/webhook/', function (req, res) {
             // add the todo entries to db
             if (sender != process.env.BOTSENDER_ID) {
                 if (parseMessage(event)) {
-                    
-                    let entries = {
-                        userid: sender,
-                        todos: event.message.text
-                    }
-                    
-                    Entry.findOneAndUpdate({userid: sender}, entries, {upsert: true}, (err, docs) => {
+                    Entry.findOneAndUpdate({userid: sender}, {$push: {todos: event.message.text}, upsert: true}, (err, docs) => {
                        if (err) {
                            console.log('Something really weird has happened:', err);
                             return;

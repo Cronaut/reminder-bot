@@ -8,14 +8,10 @@ const EntrySchema = mongoose.Schema({
         required: true
     },
     todos:{
-        type: String,
-        required: true
-    }
-    /*todos:{
         type: Array,
         "default" : [],
         required: true
-    }*/
+    }
 });
 
 const Entry = module.exports = mongoose.model('Entry', EntrySchema);
