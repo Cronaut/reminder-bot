@@ -87,9 +87,8 @@ app.post('/webhook/', function (req, res) {
                         console.log('The entry has been added.');
                     }
                 });
+                sendTextMessage(sender, 'I used to work just fine ' + event.message.text);
             }
-            
-            sendTextMessage(sender, "Your todo is:", event.message.text);
         }
     }
     res.sendStatus(200);
