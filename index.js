@@ -123,7 +123,7 @@ function parseMessage(message) {
     // includes "view todos"
     
     if (typeof message === 'string' || message instanceof String) {
-        if (message.startswith('-')) {
+        if (message.startsWith('-')) {
             return true;
         }
     } else {
