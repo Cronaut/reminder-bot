@@ -81,13 +81,12 @@ app.post('/webhook/', function (req, res) {
                         todos: event.message.text
                     }
                     
-                    let upsert = {upsert: true};
-                    Entry.findOneAndUpdate({userid: sender}, entries, upsert, (err, docs) => {
+                    Entry.findOneAndUpdate({userid: sender}, entries, {upsert: true}, (err, docs) => {
                        if (err) {
                            console.log('Something really weird has happened:', err);
                             return;
                        } else {
-                            console.log(upsert.upsert.valueOf() ? 'Entry has been updated.' : 'Entry has been added.');
+                            console.log('Entry has been added/updated.');
                        }
                     });
                 }
