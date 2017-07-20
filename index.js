@@ -24,20 +24,6 @@ db.once('open', () => {
 
 const app = express();
 
-// Create seed data
-
-let seedData = [
-  {
-    id: '1',
-    todos: ['meowing', 'drawing for 2 hours']
-  },
-  {
-    id: '2',
-    todos: ['dancing', 'playing guitar', 'watching birds']
-  },
-
-];
-
 app.set('port', (process.env.PORT || 5000));
 
 // Process application/x-www-form-urlencoded
@@ -134,21 +120,3 @@ function parseMessage(event) {
     }
    return false;
 }
-
-/*mongodb.MongoClient.connect(uri, (err, db) => {
-      if (err) throw err;
-      let users = db.collection('users');
-
-      users.insert(seedData, (err, result) => {
-          if (err) throw err;
-
-          seedData.forEach((user, i) => {
-            console.log(user.todos + i);
-
-          });
-
-          db.close((err) => {
-              if (err) throw err;
-          });
-      });
-});*/
