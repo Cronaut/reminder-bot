@@ -70,9 +70,8 @@ app.post('/webhook/', function (req, res) {
     for (let i = 0; i < messaging_events.length; i++) {
         let event = req.body.entry[0].messaging[i];
         let sender = event.sender.id;
-        let message = event.message.text;
 
-        if (event.message && message) {
+        if (event.message && event.message.text) {
             // add the todo entries to db
             if (sender != process.env.BOTSENDER_ID) {
                 if (parseMessage(event)) {
@@ -89,7 +88,7 @@ app.post('/webhook/', function (req, res) {
                             console.log(upsert ? 'Entry has been updated.' : 'Entry has been added.');
                        }
                     });
-                    
+
                     /*entries.save((err) => {
                         if(err) {
                             console.log('Something really weird has happened:', err);
