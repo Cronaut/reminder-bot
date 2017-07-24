@@ -85,7 +85,7 @@ app.post('/webhook/', function (req, res) {
                         if (err) throw err;
                         else {
                             console.log('User found, list todos.');
-                            sendTextMessage(sender, 'THIS HAS TO BE DONE ASAP: \n' + docs.todos[0]);
+                            sendTextMessage(sender, 'THIS HAS TO BE DONE ASAP: \n' + docs.todos);
                         }
                     });
                 }

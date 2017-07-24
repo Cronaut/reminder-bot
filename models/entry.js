@@ -12,6 +12,6 @@ const EntrySchema = mongoose.Schema({
         "default" : [],
         required: true
     }
-});
+}, {collection: 'entries'});
 
 const Entry = module.exports = mongoose.model('Entry', EntrySchema);
