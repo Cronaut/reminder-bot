@@ -8,8 +8,13 @@ const mongoose = require('mongoose');
 
 const config = require('./config/database');
 
-// bring up the Entry model
+// Bring up the Entry model
 let Entry = require('./models/entry');
+// Enum structure for bot actions
+const ACT = {
+    ADD: 0,
+    LIST: 1
+};
 
 mongoose.connect(config.database);
 let db = mongoose.connection;
@@ -58,9 +63,9 @@ app.post('/webhook/', function (req, res) {
         let sender = event.sender.id;
 
         if (event.message && event.message.text) {
-            // add the todo entries to db
+            // Add the todo entries to db
             if (sender != process.env.BOTSENDER_ID) {
-                if (parseMessage(event)) {
+                if (parseMessage(event) == ACT.ADD) {
                     Entry.findOneAndUpdate({userid: sender}, {$addToSet: {todos: event.message.text}}, {upsert: true}, (err, docs) => {
                         if (!docs) {
                                 docs = new Entry();
@@ -70,11 +75,20 @@ app.post('/webhook/', function (req, res) {
                             return;
                        } else {
                             console.log('Entry has been added/updated.');
+                            sendTextMessage(sender, 'I ADDED THIS TO YOUR TODOS, MATE: \n' + event.message.text);
                        }
                     });
                 }
-                
-                sendTextMessage(sender, 'I still work fine, I just pretended: \n' + event.message.text);
+                if (parseMessage(event) == ACT.LIST) {
+                    let entry = Entry.find({userid: sender}, (err, docs) => {
+                        if (err) throw err;
+                        else {
+                            console.log('User found, list todos.');
+                        }
+                    });
+
+                    sendTextMessage(sender, 'THIS HAS TO BE DONE ASAP: \n' + entry.todos);
+                }
             }
         }
     }
@@ -110,8 +124,12 @@ function parseMessage(event) {
     let message = event.message.text;    
     if (typeof message === 'string' || message instanceof String) {
         if (message.startsWith('-')) {
-            return true;
+            return ACT.ADD;
         }
+        if (message.contains('list')) {
+            return ACT.LIST;
+        }
+        
     } else {
         throw "The passed object is somehow not a string.";
     }
