@@ -126,7 +126,7 @@ function parseMessage(event) {
         if (message.startsWith('-')) {
             return ACT.ADD;
         }
-        if (message.contains('list')) {
+        if (message.includes('list')) {
             return ACT.LIST;
         }
         
