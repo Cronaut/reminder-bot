@@ -12,8 +12,9 @@ const config = require('./config/database');
 let Entry = require('./models/entry');
 // Enum structure for bot actions
 const ACT = {
-    ADD: 0,
-    LIST: 1
+    NONE: 0,
+    ADD: 1,
+    LIST: 2
 };
 
 mongoose.connect(config.database);
@@ -80,14 +81,17 @@ app.post('/webhook/', function (req, res) {
                     });
                 }
                 if (parseMessage(event) == ACT.LIST) {
-                    let entry = Entry.find({userid: sender}, (err, docs) => {
+                    Entry.find({userid: sender}, (err, docs) => {
                         if (err) throw err;
                         else {
                             console.log('User found, list todos.');
+                            sendTextMessage(sender, 'THIS HAS TO BE DONE ASAP: \n' + docs.todos);
                         }
                     });
-
-                    sendTextMessage(sender, 'THIS HAS TO BE DONE ASAP: \n' + entry.todos);
+                }
+                if (parseMessage(event) == ACT.NONE) {
+                    sendTextMessage(sender, 'I GOT THIS FROM YOU: \n' 
+                                    + event.message.text + '\nBUT I\'M TOO DUMB TO RESPOND JUST YET');                    
                 }
             }
         }
@@ -125,9 +129,12 @@ function parseMessage(event) {
     if (typeof message === 'string' || message instanceof String) {
         if (message.startsWith('-')) {
             return ACT.ADD;
-        }
-        if (message.includes('list')) {
-            return ACT.LIST;
+        } else {
+            if (message.includes('list')) {
+                return ACT.LIST;
+            } else {
+                return ACT.NONE;
+            }
         }
         
     } else {
