@@ -8,8 +8,14 @@ const mongoose = require('mongoose');
 
 const config = require('./config/database');
 
-// bring up the Entry model
+// Bring up the Entry model
 let Entry = require('./models/entry');
+// Enum structure for bot actions
+const ACT = {
+    NONE: 0,
+    ADD: 1,
+    LIST: 2
+};
 
 mongoose.connect(config.database);
 let db = mongoose.connection;
@@ -23,20 +29,6 @@ db.once('open', () => {
 });
 
 const app = express();
-
-// Create seed data
-
-let seedData = [
-  {
-    id: '1',
-    todos: ['meowing', 'drawing for 2 hours']
-  },
-  {
-    id: '2',
-    todos: ['dancing', 'playing guitar', 'watching birds']
-  },
-
-];
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -53,7 +45,7 @@ app.get('/', function (req, res) {
 
 // for Facebook verification
 app.get('/webhook/', function (req, res) {
-    if (req.query['hub.verify_token'] === 'my_voice_is_my_password_verify_me') {
+    if (req.query['hub.verify_token'] === process.env.VERIFY_TOKEN) {
         res.send(req.query['hub.challenge']);
     }
     res.send('Error, wrong token');
@@ -72,26 +64,35 @@ app.post('/webhook/', function (req, res) {
         let sender = event.sender.id;
 
         if (event.message && event.message.text) {
-            // add the todo entries to db
+            // Add the todo entries to db
             if (sender != process.env.BOTSENDER_ID) {
-                if (parseMessage(event)) {
-                    
-                    let entries = {
-                        userid: sender,
-                        todos: event.message.text
-                    }
-                    
-                    Entry.findOneAndUpdate({userid: sender}, entries, {upsert: true}, (err, docs) => {
-                       if (err) {
+                if (parseMessage(event) == ACT.ADD) {
+                    Entry.findOneAndUpdate({userid: sender}, {$addToSet: {todos: event.message.text}}, {upsert: true}, (err, docs) => {
+                        if (!docs) {
+                                docs = new Entry();
+                        }
+                        if (err) {
                            console.log('Something really weird has happened:', err);
                             return;
                        } else {
                             console.log('Entry has been added/updated.');
+                            sendTextMessage(sender, 'I ADDED THIS TO YOUR TODOS, MATE: \n' + event.message.text);
                        }
                     });
                 }
-                
-                sendTextMessage(sender, 'I still work fine, I just pretended: \n' + event.message.text);
+                if (parseMessage(event) == ACT.LIST) {
+                    Entry.find({userid: sender}, (err, docs) => {
+                        if (err) throw err;
+                        else {
+                            console.log('User found, list todos.');
+                            sendTextMessage(sender, 'THIS HAS TO BE DONE ASAP: \n' + docs.todos);
+                        }
+                    });
+                }
+                if (parseMessage(event) == ACT.NONE) {
+                    sendTextMessage(sender, 'I GOT THIS FROM YOU: \n' 
+                                    + event.message.text + '\nBUT I\'M TOO DUMB TO RESPOND JUST YET');                    
+                }
             }
         }
     }
@@ -127,28 +128,17 @@ function parseMessage(event) {
     let message = event.message.text;    
     if (typeof message === 'string' || message instanceof String) {
         if (message.startsWith('-')) {
-            return true;
+            return ACT.ADD;
+        } else {
+            if (message.includes('list')) {
+                return ACT.LIST;
+            } else {
+                return ACT.NONE;
+            }
         }
+        
     } else {
         throw "The passed object is somehow not a string.";
     }
    return false;
 }
-
-/*mongodb.MongoClient.connect(uri, (err, db) => {
-      if (err) throw err;
-      let users = db.collection('users');
-
-      users.insert(seedData, (err, result) => {
-          if (err) throw err;
-
-          seedData.forEach((user, i) => {
-            console.log(user.todos + i);
-
-          });
-
-          db.close((err) => {
-              if (err) throw err;
-          });
-      });
-});*/
